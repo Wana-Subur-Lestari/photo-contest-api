@@ -14,6 +14,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -102,6 +103,7 @@ func initDB() {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
 		user, pass, host, port, dbName,
 	)
+
 	db, err = sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
@@ -197,6 +199,10 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(AuthResponse{Token: token, User: user})
 }
 
+func GetEnv(w http.ResponseWriter, r *http.Request) {
+	env := os.Getenv("MYSQLPORT")
+	json.NewEncoder(w).Encode(env)
+}
 func Login(w http.ResponseWriter, r *http.Request) {
 	var req LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -479,6 +485,9 @@ func GetLeaderboard(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	// Load environment variables
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	if secret := os.Getenv("JWT_SECRET"); secret != "" {
 		jwtSecret = []byte(secret)
 	}
@@ -491,6 +500,7 @@ func main() {
 	// Public routes
 	router.HandleFunc("/api/auth/register", Register).Methods("POST")
 	router.HandleFunc("/api/auth/login", Login).Methods("POST")
+	router.HandleFunc("/api/env", Login).Methods("GET")
 
 	// Protected routes
 	api := router.PathPrefix("/api").Subrouter()
@@ -525,5 +535,5 @@ func main() {
 	}
 
 	fmt.Printf("Server starting on port %s...\n", port)
-	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, handler))
+	log.Fatal(http.ListenAndServe(":"+port, handler))
 }
