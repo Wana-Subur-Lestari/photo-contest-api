@@ -525,5 +525,5 @@ func main() {
 	}
 
 	fmt.Printf("Server starting on port %s...\n", port)
-	log.Fatal(http.ListenAndServe(":"+port, handler))
+	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, handler))
 }
