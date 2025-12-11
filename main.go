@@ -517,7 +517,7 @@ func main() {
 
 	// CORS
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://172.10.10.27:5173", "http://localhost:5173", "http://172.10.10.27:5174", "http://localhost:5174"},
+		AllowedOrigins:   []string{"https://photo-contest-2025.netlify.app"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Authorization", "Content-Type"},
 		AllowCredentials: true,
