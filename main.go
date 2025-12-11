@@ -93,7 +93,7 @@ type PhotoUpload struct {
 func initDB() {
 	var err error
 	// Update with your MySQL credentials
-	dsn := "root:wanasl@tcp(localhost:3306)/photo_voting?parseTime=true"
+	dsn := "root:skpxZQqHVqtggBfAMHJloOaDImlgIxAz@yamabiko.proxy.rlwy.net:26110/railway?parseTime=true"
 	db, err = sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
