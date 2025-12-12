@@ -94,27 +94,15 @@ type PhotoUpload struct {
 func initDB() {
 	var err error
 	// Update with your MySQL credentials
-	var dsn string
-	if env := os.Getenv("APP_ENV"); env == "" {
-		user := os.Getenv("MYSQLUSER")
-		pass := os.Getenv("MYSQLPASSWORD")
-		host := os.Getenv("MYSQLHOST")
-		port := os.Getenv("MYSQLPORT")
-		dbName := os.Getenv("MYSQLDATABASE")
-		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
-			user, pass, host, port, dbName,
-		)
-	} else {
-		user := os.Getenv("MYSQLUSER_DEV")
-		pass := os.Getenv("MYSQLPASSWORD_DEV")
-		host := os.Getenv("MYSQLHOST_DEV")
-		port := os.Getenv("MYSQLPORT_DEV")
-		dbName := os.Getenv("MYSQLDATABASE_DEV")
+	user := os.Getenv("MYSQLUSER")
+	pass := os.Getenv("MYSQLPASSWORD")
+	host := os.Getenv("MYSQLHOST")
+	port := os.Getenv("MYSQLPORT")
+	dbName := os.Getenv("MYSQLDATABASE")
 
-		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
-			user, pass, host, port, dbName,
-		)
-	}
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
+		user, pass, host, port, dbName,
+	)
 
 	db, err = sql.Open("mysql", dsn)
 	if err != nil {
@@ -533,7 +521,7 @@ func main() {
 
 	// CORS
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"https://photo-contest-2025.netlify.app", "http://localhost:5173", "http://localhost:5174"},
+		AllowedOrigins:   []string{"https://photo-contest-2025.netlify.app", "http://localhost"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Authorization", "Content-Type"},
 		AllowCredentials: true,
