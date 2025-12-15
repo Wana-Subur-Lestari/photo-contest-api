@@ -14,6 +14,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -341,6 +342,30 @@ func DeletePhoto(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// get contest status
+func GetStatus(w http.ResponseWriter, r *http.Request) {
+	// Example deadline (replace with DB value)
+	deadlineStr := "2025-12-14T10:00:00Z"
+
+	deadline, err := time.Parse(time.RFC3339, deadlineStr)
+	if err != nil {
+		http.Error(w, "invalid deadline format", http.StatusBadRequest)
+		return
+	}
+
+	now := time.Now().UTC()
+
+	if now.After(deadline) {
+		w.WriteHeader(http.StatusAccepted)
+		json.NewEncoder(w).Encode(map[string]string{
+			"is_active": "false",
+		})
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"is_active": "true"})
+}
+
 // Ranking Handlers
 func SubmitRankings(w http.ResponseWriter, r *http.Request) {
 	var req RankingSubmission
@@ -484,10 +509,12 @@ func GetLeaderboard(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	// Load environment variables
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	log.Fatal("Error loading .env file")
-	// }
+	if APP_ENV := os.Getenv("APP_ENV"); APP_ENV != "production" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
+	}
 	if secret := os.Getenv("JWT_SECRET"); secret != "" {
 		jwtSecret = []byte(secret)
 	}
@@ -498,6 +525,7 @@ func main() {
 	router := mux.NewRouter()
 
 	// Public routes
+	router.HandleFunc("/api/contest/status", GetStatus).Methods("GET")
 	router.HandleFunc("/api/auth/register", Register).Methods("POST")
 	router.HandleFunc("/api/auth/login", Login).Methods("POST")
 
@@ -520,7 +548,7 @@ func main() {
 
 	// CORS
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"https://photo-contest-2025.netlify.app"},
+		AllowedOrigins:   []string{"https://photo-contest-2025.netlify.app", "http://localhost:5173"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Authorization", "Content-Type"},
 		AllowCredentials: true,
